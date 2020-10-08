@@ -176,6 +176,10 @@ passport.use(new JwtStrategy(options, function(jwt_payload, done) {
     }
 }));
 
+app.get('/', (req, res) => {
+    res.status(200).json("Welcome to OnlineShopAPI");
+});
+
 // Get all items
 app.get('/items', (req, res) => {
     // creates a copy of an object so that the original object wont get affected
