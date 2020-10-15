@@ -1,0 +1,501 @@
+openapi: 3.0.0
+info:
+  title: OnlineShopAPI
+  version: '1.0'
+  description: This API is for online shopping service
+  contact:
+    name: Thien Nguyen
+    email: thien_@hotmail.fi
+servers:
+  - url: 'http://localhost:3000'
+tags:
+  - name: items
+    description: Everything about your items
+  - name: users
+    description: Everything about your users
+paths:
+  /login:
+    post:
+      tags:
+        - users
+      summary: postLogin
+      operationId: postLogin
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+      security:
+        - HTTPBasic: []
+      description: Use HTTPBasic authentication to login.
+  /items:
+    get:
+      tags:
+        - items
+      summary: getItems
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/items'
+              examples: {}
+      operationId: getItems
+      description: Get information on all items.
+    post:
+      tags:
+        - items
+      summary: postItems
+      operationId: postItems
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      description: Post new item.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/items'
+            examples: {}
+      security:
+        - JWT: []
+  /search:
+    get:
+      tags:
+        - items
+      summary: getSearch
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/items'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+      operationId: getSearch
+      description: 'Search for items by category, location and/or postingDate.'
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: category
+        - schema:
+            type: string
+          in: query
+          name: location
+          description: country
+        - schema:
+            type: string
+          in: query
+          name: postingDate
+  /users:
+    post:
+      tags:
+        - users
+      summary: postUsers
+      operationId: postUsers
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+      description: Create new user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/fullUserData'
+  '/items/{itemId}':
+    get:
+      tags:
+        - items
+      summary: getItemsById
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/postedItems'
+        '404':
+          description: Not Found
+      operationId: getItemsById
+      description: Get specific item.
+    delete:
+      tags:
+        - items
+      summary: deleteItemById
+      operationId: deleteItemById
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      description: Delete posted item.
+      security:
+        - JWT: []
+    parameters:
+      - schema:
+          type: string
+        name: itemId
+        in: path
+        required: true
+    put:
+      tags:
+        - items
+      summary: putItemsById
+      operationId: putItemsById
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      description: Update posted item.
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/items'
+  '/users/{userId}':
+    parameters:
+      - schema:
+          type: string
+        name: userId
+        in: path
+        required: true
+    get:
+      tags:
+        - users
+      summary: getUserById
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/fullUserData'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      operationId: getUserById
+      description: Get specific user.
+      security:
+        - JWT: []
+    put:
+      tags:
+        - users
+      summary: putUsersById
+      operationId: putUsersById
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      description: Update User.
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/fullUserData'
+            examples: {}
+          application/xml:
+            schema:
+              $ref: ''
+    delete:
+      tags:
+        - users
+      summary: deleteUserById
+      operationId: deleteUserById
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      description: Delete user.
+      security:
+        - JWT: []
+  '/users({userId}/items':
+    parameters:
+      - schema:
+          type: string
+        name: userId
+        in: path
+        required: true
+    get:
+      tags:
+        - items
+      summary: getItemsByUserId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/items'
+        '404':
+          description: Not Found
+      operationId: getItemsByUserId
+      description: Get all the items that belong to a specific user.
+  '/items/{itemId}/images':
+    parameters:
+      - schema:
+          type: string
+        name: itemId
+        in: path
+        required: true
+    put:
+      tags:
+        - items
+      summary: putImagesById
+      operationId: putImagesById
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+      description: Update posted items images
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+components:
+  schemas:
+    items:
+      title: items
+      type: object
+      x-examples:
+        example:
+          userId: 2c4a230c-5085-4924-a3e1-25fb4fc5965b
+          itemId: f11b669d-7201-4c21-88af-d85092f0c005
+          title: Samsung Galaxy S7
+          description: Brand new
+          category:
+            phones: true
+            computers: false
+            components: false
+          images: image.png
+          askingPrice: 300e
+          postingDate: '2019-08-24'
+          deliveryType:
+            shipping: true
+            pickup: true
+      properties:
+        userId:
+          type: string
+          format: uuid
+        itemId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: object
+          required:
+            - phones
+            - computers
+            - components
+          properties:
+            phones:
+              type: boolean
+            computers:
+              type: boolean
+            components:
+              type: boolean
+        images:
+          type: object
+          properties:
+            imageName:
+              type: string
+        askingPrice:
+          type: string
+        postingDate:
+          type: string
+          format: date
+        deliveryType:
+          type: object
+          required:
+            - shipping
+            - pickup
+          properties:
+            shipping:
+              type: boolean
+            pickup:
+              type: boolean
+      required:
+        - title
+        - category
+        - askingPrice
+        - postingDate
+        - deliveryType
+    userInfos:
+      title: userInfos
+      type: object
+      x-examples:
+        example:
+          userId: 2c4a230c-5085-4924-a3e1-25fb4fc5965b
+          location:
+            country: Finland
+            city: Oulu
+            postalCode: 90150
+            address: Pihatie 13
+          contactInfo:
+            email: anonymous@hotmail.com
+            phoneNumber: '0403261254'
+      properties:
+        userId:
+          type: string
+          format: uuid
+        location:
+          type: object
+          required:
+            - country
+            - city
+            - postalCode
+            - address
+          properties:
+            country:
+              type: string
+            city:
+              type: string
+            postalCode:
+              type: number
+            address:
+              type: string
+        contactInfo:
+          type: object
+          required:
+            - email
+          properties:
+            email:
+              type: string
+            phoneNumber:
+              type: string
+      required:
+        - location
+        - contactInfo
+    postedItems:
+      title: postedItem
+      type: object
+      x-examples:
+        example:
+          item:
+            userId: 2c4a230c-5085-4924-a3e1-25fb4fc5965b
+            itemId: f11b669d-7201-4c21-88af-d85092f0c005
+            title: OnePlus 8
+            description: It has a small crack on a screen
+            category:
+              phones: true
+              computers: false
+              components: false
+            images: image.png
+            askingPrice: 500e
+            postingDate: '2020-02-19'
+            deliveryType:
+              shipping: true
+              pickup: true
+          userInfo:
+            userId: 2c4a230c-5085-4924-a3e1-25fb4fc5965b
+            location:
+              country: Finland
+              city: Oulu
+              postalCode: 90150
+              address: Pihatie 13
+            contactInfo:
+              email: someone@gmail.com
+              phoneNumber: '0402165478'
+      properties:
+        items:
+          $ref: '#/components/schemas/items'
+        userInfo:
+          $ref: '#/components/schemas/userInfos'
+    users:
+      title: users
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+      x-examples:
+        example:
+          userId: 2c4a230c-5085-4924-a3e1-25fb4fc5965b
+          username: anonymous
+          password: password123
+    fullUserData:
+      title: fullUserData
+      type: object
+      x-examples:
+        example:
+          user:
+            userId: 2c4a230c-5085-4924-a3e1-25fb4fc5965b
+            username: anonymous
+            password: password123
+          userInfo:
+            userId: 2c4a230c-5085-4924-a3e1-25fb4fc5965b
+            location:
+              country: Finland
+              city: Oulu
+              postalCode: 90150
+              address: Pihatie 13
+            contactInfo:
+              email: anonymous@hotmail.com
+              phoneNumber: '0401648235'
+      description: ''
+      properties:
+        users:
+          $ref: '#/components/schemas/users'
+        userInfo:
+          $ref: '#/components/schemas/userInfos'
+  securitySchemes:
+    HTTPBasic:
+      type: http
+      scheme: basic
+    JWT:
+      type: http
+      scheme: bearer
